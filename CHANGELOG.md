@@ -2,8 +2,10 @@
 
 All user-visible changes, newest first. Odoo-style tags: ADD, IMP, FIX, REM.
 
-## Unreleased (18.0)
+## 18.0.1.0.1 (2026-10-29)
 
+- [FIX] orderkoll_core: a spreadsheet that unzips to more than 50 MB, or to over 100 times its own
+  size (a "zip bomb"), is refused before it is opened, instead of filling the server's memory.
 - [IMP] orderkoll_core: the store page and cover say Community (Enterprise is listed again once it
   has been tested on Enterprise).
 - [FIX] orderkoll_core, orderkoll_tier_glue: each module folder carries its own licence text
