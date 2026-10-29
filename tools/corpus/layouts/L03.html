@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="sv"><head><meta charset="utf-8"><title>Inköpsorder {{ po.po_number }}</title>
+<style>
+@page { size: A4; margin: 20mm; }
+body { font-family: Georgia, "DejaVu Serif", serif; font-size: 10.5pt; color: #1a1a1a; }
+h1 { font-size: 16pt; margin: 0 0 2px; font-weight: normal; letter-spacing: 2px; text-transform: uppercase; }
+.sub { color: #777; font-size: 9pt; margin-bottom: 14px; }
+.info { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.info td { vertical-align: top; padding: 2px 0; width: 50%; }
+.info .k { color: #777; font-size: 9pt; }
+.lines { width: 100%; border-collapse: collapse; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; }
+.lines th { text-align: left; font-weight: normal; font-style: italic; padding: 6px 4px; border-bottom: 1px solid #1a1a1a; }
+.lines td { padding: 5px 4px; }
+.lines tr:nth-child(even) td { background: #f5f3ee; }
+.h { text-align: right; }
+.summa { margin-top: 10px; margin-left: auto; width: 65mm; }
+.summa td { padding: 2px 4px; }
+.summa .tot td { font-weight: bold; border-top: 1px solid #1a1a1a; }
+.fot { margin-top: 24px; font-size: 9pt; color: #555; border-top: 1px dotted #999; padding-top: 6px; }
+</style></head><body>
+<div style="margin-bottom:10px">{{ logo }}</div>
+<h1>Inköpsorder</h1>
+<div class="sub">{{ partner.name }} · Org.nr/VAT {{ partner.vat }} · {{ partner.street }}, {{ partner.zip }} {{ partner.city }}</div>
+<table class="info">
+<tr><td><span class="k">Ordernummer</span><br><b>{{ po.po_number }}</b></td><td><span class="k">Leverantör</span><br>{{ company.name }}<br>{{ company.street }}, {{ company.zip }} {{ company.city }}</td></tr>
+<tr><td><span class="k">Orderdatum</span><br>{{ po_date }}</td><td><span class="k">Önskat leveransdatum</span><br>{{ requested_date }}</td></tr>
+<tr><td><span class="k">Leveransadress</span><br>{{ po.ship_to }}</td><td><span class="k">Vår referens</span><br>{{ po.buyer_email }}<br>Valuta: {{ cur }}</td></tr>
+</table>
+<table class="lines">
+<thead><tr><th>Art.nr</th><th>Benämning</th><th class="h">Antal</th><th>Enhet</th><th class="h">À-pris</th><th class="h">Belopp</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr><td>{{ l.code }}</td><td>{{ l.desc }}</td><td class="h">{{ l.qty }}</td><td>{{ l.uom }}</td><td class="h">{{ l.price }}</td><td class="h">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody></table>
+<table class="summa">
+<tr><td>Netto</td><td class="h">{{ subtotal }}</td></tr>
+<tr><td>Moms {{ tax_pct }} %</td><td class="h">{{ tax }}</td></tr>
+<tr class="tot"><td>Att betala {{ cur }}</td><td class="h">{{ total }}</td></tr>
+</table>
+<div class="fot">{% if po.notes %}{{ po.notes }} · {% endif %}Ange vårt ordernummer på följesedel och faktura.</div>
+</body></html>

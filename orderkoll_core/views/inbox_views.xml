@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <record id="view_inbox_list" model="ir.ui.view">
+        <field name="name">orderkoll.inbox.list</field>
+        <field name="model">orderkoll.inbox</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="company_id" groups="base.group_multi_company" />
+                <field name="imap_enabled" />
+                <field name="imap_user" />
+                <field name="imap_last_fetch" />
+                <field name="document_count" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_inbox_form" model="ir.ui.view">
+        <field name="name">orderkoll.inbox.form</field>
+        <field name="model">orderkoll.inbox</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+            name="action_test_imap"
+            type="object"
+            string="Test IMAP login"
+            class="btn-secondary"
+          />
+                    <button
+            name="fetch_mail"
+            type="object"
+            string="Fetch now"
+            class="btn-primary"
+          />
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button
+              name="action_open_documents"
+              type="object"
+              class="oe_stat_button"
+              icon="article"
+            >
+                            <field
+                name="document_count"
+                widget="statinfo"
+                string="Documents"
+              />
+                        </button>
+                    </div>
+                    <widget
+            name="web_ribbon"
+            title="Archived"
+            bg_color="text-bg-danger"
+            invisible="active"
+          />
+                    <group>
+                        <group string="Inbox">
+                            <field name="name" />
+                            <field name="active" invisible="1" />
+                            <field name="user_id" />
+                            <field
+                name="company_id"
+                groups="base.group_multi_company"
+              />
+                        </group>
+                        <group string="Behaviour">
+                            <field name="default_pricelist_tolerance" />
+                            <field name="auto_create_when_clean" />
+                            <field name="price_source" />
+                        </group>
+                    </group>
+                    <group string="Mail alias (Odoo incoming mail)">
+                        <group>
+                            <label for="alias_name" string="Alias address" />
+                            <div class="oe_inline" name="alias_def">
+                                <field
+                  name="alias_name"
+                  class="oe_inline"
+                  placeholder="e.g. po"
+                />
+                                <span>@</span>
+                                <field
+                  name="alias_domain_id"
+                  class="oe_inline"
+                  placeholder="domain"
+                  options="{'no_create': True}"
+                />
+                            </div>
+                        </group>
+                    </group>
+                    <group string="IMAP intake">
+                        <group>
+                            <field name="imap_enabled" />
+                            <field name="imap_host" />
+                            <field name="imap_port" />
+                            <field name="imap_ssl" />
+                            <field name="imap_folder" />
+                        </group>
+                        <group>
+                            <field name="imap_user" />
+                            <field name="imap_password" password="True" />
+                            <field name="imap_last_uid" />
+                            <field name="imap_uidvalidity" />
+                            <field name="imap_last_fetch" />
+                            <field
+                name="imap_last_error"
+                invisible="not imap_last_error"
+              />
+                        </group>
+                    </group>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="action_inbox" model="ir.actions.act_window">
+        <field name="name">Inboxes</field>
+        <field name="res_model">orderkoll.inbox</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Order {{ po.po_number }}</title>
+<style>
+@page { size: A4; margin: 22mm 24mm; }
+body { font-family: "DejaVu Sans", Tahoma, sans-serif; font-size: 10.5pt; color: #2b2b2b; }
+.head { text-align: center; margin-bottom: 18px; }
+.head h1 { font-size: 20pt; margin: 0; letter-spacing: 4px; color: #8a6d3b; }
+.head p { margin: 2px 0; color: #777; font-size: 9pt; }
+.ref { display: flex; justify-content: space-between; border-top: 1px solid #8a6d3b; border-bottom: 1px solid #8a6d3b; padding: 6px 0; margin-bottom: 14px; font-size: 9.5pt; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; color: #8a6d3b; font-weight: normal; text-transform: uppercase; font-size: 8.5pt; padding: 4px 0; border-bottom: 1px solid #ccc; }
+td { padding: 6px 0; border-bottom: 1px solid #eee; }
+.r { text-align: right; }
+.tot { margin-top: 14px; text-align: right; line-height: 1.6; }
+.tot b { font-size: 12pt; }
+.sig { margin-top: 30px; font-size: 9.5pt; }
+</style></head><body>
+<div class="head"><div style="margin-bottom:8px">{{ logo }}</div><h1>ORDER</h1><p>{{ partner.name }} · {{ partner.street }} · {{ partner.zip }} {{ partner.city }}</p></div>
+<div class="ref"><span>Order no. <b>{{ po.po_number }}</b></span><span>{{ po_date }}</span><span>Delivery by {{ requested_date }}</span><span>{{ cur }}</span></div>
+<p>To {{ company.name }}, {{ company.street }}, {{ company.zip }} {{ company.city }}. Deliver to: {{ po.ship_to }}.</p>
+<table>
+<thead><tr><th>Description</th><th class="r">Quantity</th><th class="r">Price</th><th class="r">Total</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr><td>{{ l.desc }}</td><td class="r">{{ l.qty }} {{ l.uom }}</td><td class="r">{{ l.price }}</td><td class="r">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody></table>
+<div class="tot">Goods {{ subtotal }}<br>VAT {{ tax_pct }}% {{ tax }}<br><b>Total {{ total }} {{ cur }}</b></div>
+<div class="sig">{% if po.notes %}{{ po.notes }}<br>{% endif %}Questions: {{ po.buyer_email }}</div>
+</body></html>

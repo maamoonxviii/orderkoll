@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl). -->
+<odoo>
+    <record id="view_inbox_form_tier_glue" model="ir.ui.view">
+        <field name="name">orderkoll.inbox.form.tier.glue</field>
+        <field name="model">orderkoll.inbox</field>
+        <field name="inherit_id" ref="orderkoll_core.view_inbox_form" />
+        <field name="arch" type="xml">
+            <field name="auto_create_when_clean" position="after">
+                <field name="tier_validation_on_ready" />
+            </field>
+        </field>
+    </record>
+</odoo>

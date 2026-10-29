@@ -1,0 +1,15 @@
+id,name,model_id,group_id/id,operation,domain
+access_orderkoll_inbox_user,orderkoll.inbox user,orderkoll.inbox,orderkoll_core.group_orderkoll_user,r,
+access_orderkoll_inbox_manager,orderkoll.inbox manager,orderkoll.inbox,orderkoll_core.group_orderkoll_manager,crud,
+rule_inbox_company,Orderkoll inbox: own companies,orderkoll.inbox,,crud,"[('company_id', 'in', company_ids)]"
+access_orderkoll_document_user,orderkoll.document user,orderkoll.document,orderkoll_core.group_orderkoll_user,cru,
+access_orderkoll_document_manager,orderkoll.document manager,orderkoll.document,orderkoll_core.group_orderkoll_manager,crud,
+rule_document_company,Orderkoll document: own companies,orderkoll.document,,crud,"[('company_id', 'in', company_ids)]"
+access_orderkoll_line_user,orderkoll.line user,orderkoll.line,orderkoll_core.group_orderkoll_user,crud,
+rule_line_company,Orderkoll line: own companies,orderkoll.line,,crud,"[('company_id', 'in', company_ids)]"
+access_orderkoll_sku_map_user,orderkoll.sku_map user,orderkoll.sku_map,orderkoll_core.group_orderkoll_user,cru,
+access_orderkoll_sku_map_manager,orderkoll.sku_map manager,orderkoll.sku_map,orderkoll_core.group_orderkoll_manager,crud,
+rule_sku_map_company,Orderkoll customer code memory: own companies,orderkoll.sku_map,,crud,"['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]"
+access_orderkoll_pick_partner_user,orderkoll.pick_partner user,orderkoll.pick_partner,orderkoll_core.group_orderkoll_user,crud,
+access_orderkoll_map_sku_user,orderkoll.map_sku user,orderkoll.map_sku,orderkoll_core.group_orderkoll_user,crud,
+access_orderkoll_reject_user,orderkoll.reject user,orderkoll.reject,orderkoll_core.group_orderkoll_user,crud,

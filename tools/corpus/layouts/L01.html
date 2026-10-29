@@ -1,0 +1,47 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Purchase order {{ po.po_number }}</title>
+<style>
+@page { size: A4; margin: 18mm 16mm; }
+body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #222; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #1f4e79; padding-bottom: 8px; }
+.logo { font-size: 20pt; font-weight: bold; color: #1f4e79; letter-spacing: 1px; }
+.logo small { display: block; font-size: 8.5pt; color: #666; font-weight: normal; letter-spacing: 0; margin-top: 6px; }
+.logo svg { display: block; }
+.box { border: 1px solid #1f4e79; padding: 6px 10px; min-width: 60mm; }
+.box b { color: #1f4e79; }
+.parties { display: flex; gap: 24px; margin: 14px 0; }
+.parties div { flex: 1; }
+.parties h4 { margin: 0 0 4px; font-size: 9pt; text-transform: uppercase; color: #1f4e79; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th { background: #1f4e79; color: #fff; text-align: left; padding: 5px 6px; font-size: 9.5pt; }
+td { padding: 6px 6px; border-bottom: 1px solid #ddd; }
+.parties { margin: 18px 0 14px; }
+td.n, th.n { text-align: right; }
+.totals { width: 70mm; margin-left: auto; margin-top: 10px; }
+.totals td { border: 0; padding: 3px 6px; }
+.totals tr.t td { font-weight: bold; border-top: 1px solid #222; }
+.foot { margin-top: 18px; font-size: 9pt; color: #555; }
+</style></head><body>
+<div class="head">
+  <div class="logo">{{ logo_big }}<small>{{ partner.street }} · {{ partner.zip }} {{ partner.city }}{% if partner.vat %} · VAT {{ partner.vat }}{% endif %}</small></div>
+  <div class="box"><b>PURCHASE ORDER</b><br>No. <b>{{ po.po_number }}</b><br>Date: {{ po_date }}<br>Delivery: {{ requested_date }}</div>
+</div>
+<div class="parties">
+  <div><h4>Supplier</h4>{{ company.name }}<br>{{ company.street }}<br>{{ company.zip }} {{ company.city }}<br>{{ company.email }}</div>
+  <div><h4>Ship to</h4>{{ po.ship_to }}</div>
+  <div><h4>Contact</h4>{{ po.buyer_email }}<br>Currency: {{ cur }}</div>
+</div>
+<table>
+<thead><tr><th>Code</th><th>Description</th><th class="n">Qty</th><th>Unit</th><th class="n">Unit price</th><th class="n">Total</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr><td>{{ l.code }}</td><td>{{ l.desc }}</td><td class="n">{{ l.qty }}</td><td>{{ l.uom }}</td><td class="n">{{ l.price }}</td><td class="n">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody></table>
+<table class="totals">
+<tr><td>Subtotal</td><td class="n">{{ subtotal }}</td></tr>
+<tr><td>VAT {{ tax_pct }}%</td><td class="n">{{ tax }}</td></tr>
+<tr class="t"><td>Total {{ cur }}</td><td class="n">{{ total }}</td></tr>
+</table>
+{% if po.notes %}<p class="foot">Notes: {{ po.notes }}</p>{% endif %}
+<p class="foot">Please quote our PO number on all delivery notes and invoices.</p>
+</body></html>

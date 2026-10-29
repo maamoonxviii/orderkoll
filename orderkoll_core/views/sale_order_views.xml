@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <record id="view_order_form_orderkoll" model="ir.ui.view">
+        <field name="name">sale.order.form.orderkoll</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <field name="client_order_ref" position="after">
+                <field
+          name="orderkoll_document_id"
+          invisible="not orderkoll_document_id"
+          groups="orderkoll_core.group_orderkoll_user"
+        />
+            </field>
+        </field>
+    </record>
+</odoo>

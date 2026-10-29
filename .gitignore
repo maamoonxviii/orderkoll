@@ -1,0 +1,19 @@
+# generated corpus (layouts are versioned)
+/tools/corpus/*
+!/tools/corpus/layouts/
+!/tools/corpus/.gitkeep
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv*/
+/.env
+
+# editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store

@@ -1,0 +1,8 @@
+# Python dependencies of the modules in this repository (installed by CI and by
+# Doodba from odoo/custom/dependencies/pip.txt). Kept light on purpose.
+pdfplumber
+pypdf
+openpyxl
+# pdfplumber pulls a recent cryptography; the pyOpenSSL that ships with Odoo images then
+# fails at import (GEN_EMAIL). Pin a matching pyOpenSSL.
+pyOpenSSL>=24.2

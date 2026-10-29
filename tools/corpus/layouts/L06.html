@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><title>Bestellung {{ po.po_number }}</title>
+<style>
+@page { size: A4; margin: 20mm 20mm 25mm; }
+body { font-family: "Liberation Sans", Arial, sans-serif; font-size: 10pt; color: #000; }
+.kopf { display: flex; justify-content: space-between; }
+.firma { font-weight: bold; font-size: 14pt; }
+.firma small { display: block; font-weight: normal; font-size: 8.5pt; color: #444; margin-top: 6px; }
+.firma svg { display: block; }
+table.pos td { padding: 5px 4px; }
+.daten { border-collapse: collapse; }
+.daten td { padding: 1px 8px 1px 0; font-size: 9.5pt; }
+h1 { font-size: 15pt; margin: 18px 0 4px; }
+.anschrift { margin: 10px 0 14px; width: 80mm; }
+table.pos { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+table.pos th { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 5px 4px; text-align: left; }
+table.pos td { padding: 4px; vertical-align: top; }
+table.pos tr.alt td { background: #f2f2f2; }
+.z { text-align: right; }
+.summe { margin-left: auto; margin-top: 8px; width: 75mm; border-collapse: collapse; }
+.summe td { padding: 2px 4px; }
+.summe tr.ges td { border-top: 2px solid #000; font-weight: bold; }
+.hinweis { margin-top: 16px; font-size: 8.5pt; }
+</style></head><body>
+<div class="kopf">
+  <div class="firma">{{ logo_big }}<small>{{ partner.street }} · {{ partner.zip }} {{ partner.city }} · USt-IdNr. {{ partner.vat }}</small></div>
+  <table class="daten">
+    <tr><td>Bestellnummer</td><td><b>{{ po.po_number }}</b></td></tr>
+    <tr><td>Bestelldatum</td><td>{{ po_date }}</td></tr>
+    <tr><td>Liefertermin</td><td>{{ requested_date }}</td></tr>
+    <tr><td>Währung</td><td>{{ cur }}</td></tr>
+    <tr><td>Ansprechpartner</td><td>{{ po.buyer_email }}</td></tr>
+  </table>
+</div>
+<div class="anschrift">{{ company.name }}<br>{{ company.street }}<br>{{ company.zip }} {{ company.city }}<br>Schweden</div>
+<h1>Bestellung</h1>
+<div>Lieferanschrift: {{ po.ship_to }}</div>
+<table class="pos">
+<thead><tr><th>Pos</th><th>Artikel-Nr.</th><th>Bezeichnung</th><th class="z">Menge</th><th>ME</th><th class="z">Einzelpreis</th><th class="z">Gesamtpreis</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr{% if loop.index is even %} class="alt"{% endif %}><td>{{ "%03d"|format(l.pos * 10) }}</td><td>{{ l.code }}</td><td>{{ l.desc }}</td><td class="z">{{ l.qty }}</td><td>{{ l.uom }}</td><td class="z">{{ l.price }}</td><td class="z">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody></table>
+<table class="summe">
+<tr><td>Nettobetrag</td><td class="z">{{ subtotal }} {{ cur }}</td></tr>
+<tr><td>zzgl. {{ tax_pct }} % MwSt.</td><td class="z">{{ tax }} {{ cur }}</td></tr>
+<tr class="ges"><td>Gesamtbetrag</td><td class="z">{{ total }} {{ cur }}</td></tr>
+</table>
+<div class="hinweis">{% if po.notes %}{{ po.notes }}<br>{% endif %}Bitte geben Sie unsere Bestellnummer auf Lieferschein und Rechnung an. Es gelten unsere Einkaufsbedingungen.</div>
+</body></html>
