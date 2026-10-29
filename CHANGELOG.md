@@ -2,6 +2,13 @@
 
 All user-visible changes, newest first. Odoo-style tags: ADD, IMP, FIX, REM.
 
+## Unreleased (18.0)
+
+- [IMP] orderkoll_core: a scanned PDF on a server without OCR says so in the To-do box; the README
+  Docker install has optional lines for OCR.
+- [FIX] orderkoll_core: processing a document while the background job processes it too no longer
+  ends in an error; Odoo retries the click instead.
+
 ## 18.0.1.0.1 (2026-10-29)
 
 - [FIX] orderkoll_core: a spreadsheet that unzips to more than 50 MB, or to over 100 times its own

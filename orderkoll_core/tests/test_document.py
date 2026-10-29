@@ -5,6 +5,7 @@
 from datetime import datetime, timezone
 from unittest import mock
 
+import psycopg2
 from psycopg2 import IntegrityError
 
 from odoo.exceptions import ValidationError
@@ -200,6 +201,16 @@ class TestDocumentIntake(TransactionCase):
             doc.action_process()
         self.assertEqual((doc.state, doc.retry_count), ("error", 3))
         self.assertIn("Gave up", doc.error_message)
+
+    def test_a_concurrent_update_is_raised_for_odoo_to_retry(self):
+        doc = self.inbox._ingest_mail(
+            _mail(uid=23, attachments=[Attachment("po.pdf", self.pdf, "application/pdf")])
+        )
+        conflict = psycopg2.errors.SerializationFailure("concurrent update")
+        with mock.patch.object(type(doc), "_run_pipeline", side_effect=conflict):
+            with self.assertRaises(psycopg2.extensions.TransactionRollbackError):
+                doc.action_process()
+        self.assertNotEqual(doc.state, "error")
 
     def test_fetch_failure_is_recorded_not_raised(self):
         self.inbox.write({"imap_host": "imap.test", "imap_user": "u", "imap_password": "p"})

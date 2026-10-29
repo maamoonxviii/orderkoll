@@ -3,6 +3,7 @@
 import base64
 import logging
 
+import psycopg2
 from markupsafe import Markup, escape
 
 from odoo import _, api, fields, models
@@ -301,6 +302,10 @@ class OrderkollDocument(models.Model):
                             ),
                         }
                     )
+            except psycopg2.extensions.TransactionRollbackError:
+                # Another worker (the cron, a second click) changed this document at the same
+                # time. The transaction is lost: let Odoo retry the whole call.
+                raise
             except Exception as exc:  # noqa: BLE001 - every failure is stored, never lost
                 _logger.exception("Orderkoll document %s failed", doc.id)
                 doc.write({"state": "error", "error_message": str(exc)})
@@ -564,9 +569,18 @@ class OrderkollDocument(models.Model):
         self.ensure_one()
         items = []
         if not self.raw_text and self.state == "needs_review":
-            items.append(
-                _("No text could be read from the file. Enter the lines by hand or reject it.")
-            )
+            if self.source_type == "pdf" and not extract.ocr_available():
+                items.append(
+                    _(
+                        "No text could be read: this PDF looks like a scan, and the scan reader "
+                        "(OCR) is not installed on this Odoo server (see the install guide). "
+                        "Enter the lines by hand or reject it."
+                    )
+                )
+            else:
+                items.append(
+                    _("No text could be read from the file. Enter the lines by hand or reject it.")
+                )
         if not self.partner_id:
             items.append(
                 _(

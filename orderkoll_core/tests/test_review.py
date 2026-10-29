@@ -2,6 +2,8 @@
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
 """Review screen actions: what a person does to clear a stopped document."""
 
+from unittest import mock
+
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
@@ -167,6 +169,17 @@ class TestReview(TransactionCase):
         doc.action_mark_scan_checked()
         self.assertEqual(doc.state, "ready")
         self.assertIn("compared with the file by a person", doc.checks_log)
+
+    def test_a_scan_without_ocr_says_so(self):
+        from odoo.addons.orderkoll_core.services import extract
+
+        doc = self._doc(10, [])
+        doc.with_context(orderkoll_no_recheck=True).write(
+            {"source_type": "pdf", "raw_text": False, "state": "needs_review"}
+        )
+        with mock.patch.object(extract, "ocr_available", return_value=False):
+            doc.invalidate_recordset(["review_todo"])
+            self.assertIn("OCR", doc.review_todo)
 
     def test_each_recheck_posts_one_summary_of_its_own_checks(self):
         doc = self._doc(9, [{"customer_code": "XX-4", "description": "bolt"}])
