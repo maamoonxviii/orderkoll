@@ -4,6 +4,8 @@ All user-visible changes, newest first. Odoo-style tags: ADD, IMP, FIX, REM.
 
 ## Unreleased (18.0)
 
+- [FIX] orderkoll_core: attachments on a reply to a document's mail thread are stored sanitised
+  like new mail (an .html or .svg can no longer be opened as a page in Odoo).
 - [IMP] orderkoll_core: a scanned PDF on a server without OCR says so in the To-do box; the README
   Docker install has optional lines for OCR.
 - [FIX] orderkoll_core: processing a document while the background job processes it too no longer
