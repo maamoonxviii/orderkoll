@@ -128,6 +128,36 @@ class TestAliasIntake(TransactionCase):
         )
         self.assertEqual(stored, doc.extra_attachment_ids)  # no gateway copy of the original
 
+    def test_html_attachment_on_a_reply_is_stored_neutralised(self):
+        self.env["mail.thread"].message_process("orderkoll.document", self._raw())
+        doc = self.env["orderkoll.document"].search(
+            [("email_message_id", "=", "<alias-1@nordic-a.example>")]
+        )
+        reply = (
+            b"From: someone@elsewhere.example\r\nTo: po@alias-t.example\r\nSubject: Re: order\r\n"
+            b"Message-ID: <alias-reply-1@elsewhere.example>\r\n"
+            b"In-Reply-To: <alias-1@nordic-a.example>\r\nReferences: <alias-1@nordic-a.example>\r\n"
+            b'MIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary="b3"\r\n\r\n--b3\r\n'
+            b"Content-Type: text/plain\r\n\r\nsee attached\r\n--b3\r\n"
+            b'Content-Type: image/svg+xml; name="evil.svg"\r\n'
+            b'Content-Disposition: attachment; filename="evil.svg"\r\n\r\n'
+            b'<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>\r\n--b3--\r\n'
+        )
+        self.env["mail.thread"].message_process("orderkoll.document", reply)
+        stored = self.env["ir.attachment"].search(
+            [
+                ("res_model", "=", "orderkoll.document"),
+                ("res_id", "=", doc.id),
+                ("name", "=", "evil.svg"),
+            ]
+        )
+        self.assertEqual(stored.mapped("mimetype"), ["text/plain"])
+        reply_msg = doc.message_ids.filtered(
+            lambda m: m.message_id == "<alias-reply-1@elsewhere.example>"
+        )
+        self.assertTrue(reply_msg, "the reply is routed to the document")
+        self.assertFalse(reply_msg.attachment_ids)  # no gateway copy of the original
+
     def test_duplicate_message_id_from_another_sender_never_reaches_the_document(self):
         self.env["mail.thread"].message_process("orderkoll.document", self._raw())
         forged = self._raw().replace(b"anna.lind@nordic-a.example", b"mallory@elsewhere.example")
