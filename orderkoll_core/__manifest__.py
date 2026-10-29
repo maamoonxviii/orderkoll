@@ -3,7 +3,7 @@
 {
     "name": "Orderkoll",
     "summary": "Emailed purchase orders into draft sales orders, checked and approved by a human",
-    "version": "19.0.1.0.1",
+    "version": "19.0.1.0.2",
     "category": "Sales",
     "author": "Maamoon Mara",
     "website": "https://maamoonmara.com",

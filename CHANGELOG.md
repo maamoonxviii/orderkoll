@@ -2,6 +2,13 @@
 
 All user-visible changes, newest first. Odoo-style tags: ADD, IMP, FIX, REM.
 
+## Unreleased (19.0)
+
+- [IMP] orderkoll_core: a scanned PDF on a server without OCR says so in the To-do box; the README
+  Docker install has optional lines for OCR.
+- [FIX] orderkoll_core: processing a document while the background job processes it too no longer
+  ends in an error; Odoo retries the click instead.
+
 ## 19.0.1.0.1 (2026-10-29)
 
 - [ADD] orderkoll_tier_glue is installable on 19.0 again: OCA's `sale_tier_validation` now has a

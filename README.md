@@ -49,6 +49,9 @@ USER root
 # Orderkoll. --ignore-installed: newer copies of a few libraries the image ships from Ubuntu.
 RUN pip3 install --break-system-packages --ignore-installed --no-cache-dir \
     pdfplumber pypdf openpyxl "pyOpenSSL>=24.2"
+# Scanned PDFs (optional; delete these two lines if your customers never send scans):
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/* && pip3 install --break-system-packages --no-cache-dir pytesseract
 # Orderkoll Pro only:
 RUN pip3 install --break-system-packages --ignore-installed --no-cache-dir \
     "pydantic>=2" instructor litellm
