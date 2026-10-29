@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field
+      name="name"
+    >res.config.settings.view.form.inherit.orderkoll</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app
+          data-string="Orderkoll"
+          string="Orderkoll"
+          name="orderkoll_core"
+          groups="orderkoll_core.group_orderkoll_manager"
+        >
+                    <block title="Extraction engine" name="orderkoll_engine">
+                        <setting
+              string="LLM provider and model"
+              help="Bring your own key. The key is stored as a system parameter."
+            >
+                            <div class="row mt16">
+                                <label
+                  for="orderkoll_provider"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_provider" />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_model"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_model" />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_api_key"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field
+                  name="orderkoll_api_key"
+                  password="True"
+                />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_api_base"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field
+                  name="orderkoll_api_base"
+                  placeholder="optional"
+                />
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Checks" name="orderkoll_checks">
+                        <setting
+              string="Tolerances"
+              help="Price deviation beyond the tolerance flags the line; names below the threshold do not match."
+            >
+                            <div class="row mt16">
+                                <label
+                  for="orderkoll_tolerance_pct"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_tolerance_pct" />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_fuzzy_threshold"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_fuzzy_threshold" />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_duplicate_days"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_duplicate_days" />
+                            </div>
+                        </setting>
+                        <setting
+              string="Customer identification"
+              help="Senders on these domains are never matched to a customer automatically."
+            >
+                            <div class="row mt16">
+                                <label
+                  for="orderkoll_ignored_domains"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_ignored_domains" />
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Approval" name="orderkoll_approval">
+                        <setting string="Approval channel">
+                            <div class="row mt16">
+                                <label
+                  for="orderkoll_approval_channel"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_approval_channel" />
+                            </div>
+                            <div
+                class="row"
+                invisible="orderkoll_approval_channel != 'n8n'"
+              >
+                                <label
+                  for="orderkoll_webhook_url"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_webhook_url" />
+                            </div>
+                            <div
+                class="row"
+                invisible="orderkoll_approval_channel != 'n8n'"
+              >
+                                <label
+                  for="orderkoll_webhook_secret"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field
+                  name="orderkoll_webhook_secret"
+                  password="True"
+                />
+                            </div>
+                        </setting>
+                    </block>
+                    <block title="Monitoring" name="orderkoll_monitoring">
+                        <setting
+              string="Alerts when a document fails"
+              help="A task is always created for the inbox's responsible person. These send a message too."
+            >
+                            <div class="row mt16">
+                                <label
+                  for="orderkoll_alert_telegram_token"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field
+                  name="orderkoll_alert_telegram_token"
+                  password="True"
+                />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_alert_telegram_chat"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_alert_telegram_chat" />
+                            </div>
+                            <div class="row">
+                                <label
+                  for="orderkoll_alert_webhook_url"
+                  class="col-lg-4 o_light_label"
+                />
+                                <field name="orderkoll_alert_webhook_url" />
+                            </div>
+                        </setting>
+                        <setting
+              string="Heartbeat"
+              help="Pinged after every processing run; your monitor tells you when it stops."
+            >
+                            <field name="orderkoll_heartbeat_url" />
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

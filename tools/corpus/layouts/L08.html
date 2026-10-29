@@ -1,0 +1,42 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>PO {{ po.po_number }}</title>
+<style>
+@page { size: A4 landscape; margin: 14mm; }
+body { font-family: "Liberation Sans Narrow", "Arial Narrow", Arial, sans-serif; font-size: 9pt; color: #000; }
+.t { display: flex; justify-content: space-between; align-items: center; background: #003366; color: #fff; padding: 8px 12px; }
+.t h1 { margin: 0; font-size: 14pt; }
+.t span { font-size: 10pt; }
+.meta { display: flex; gap: 40px; margin: 8px 0; font-size: 8.5pt; }
+.meta div span { color: #003366; font-weight: bold; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1px solid #99a; padding: 3px 5px; }
+th { background: #dde4ee; font-size: 8.5pt; text-align: left; }
+.r { text-align: right; }
+.c { text-align: center; }
+tfoot td { border: 0; }
+tfoot .lbl { text-align: right; font-weight: bold; }
+.small { font-size: 8pt; color: #444; margin-top: 8px; }
+</style></head><body>
+<div class="t"><h1>PURCHASE ORDER</h1><span>PO No. <b>{{ po.po_number }}</b> · Rev 0 · {{ po_date }}</span></div>
+<div style="margin:8px 0 2px">{{ logo }}</div>
+<div class="meta">
+  <div><span>Vendor:</span> {{ company.name }}, {{ company.street }}, {{ company.zip }} {{ company.city }}</div>
+  <div><span>Ship to:</span> {{ po.ship_to }}</div>
+  <div><span>Buyer:</span> {{ po.buyer_email }}</div>
+  <div><span>Currency:</span> {{ cur }}</div>
+  <div><span>Incoterms:</span> DAP</div>
+</div>
+<table>
+<thead><tr><th class="c">Ln</th><th>Part No.</th><th>Description</th><th class="r">Order Qty</th><th>UoM</th><th class="c">Delivery date</th><th class="r">Unit price</th><th class="r">Disc %</th><th class="r">Net amount</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr><td class="c">{{ l.pos }}</td><td>{{ l.code }}</td><td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td>{{ l.uom }}</td><td class="c">{{ l.delivery }}</td><td class="r">{{ l.price }}</td><td class="r">0.00</td><td class="r">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody>
+<tfoot>
+<tr><td colspan="7"></td><td class="lbl">Net total</td><td class="r">{{ subtotal }}</td></tr>
+<tr><td colspan="7"></td><td class="lbl">VAT {{ tax_pct }}%</td><td class="r">{{ tax }}</td></tr>
+<tr><td colspan="7"></td><td class="lbl">Grand total {{ cur }}</td><td class="r"><b>{{ total }}</b></td></tr>
+</tfoot>
+</table>
+<div class="small">{% if po.notes %}{{ po.notes }} · {% endif %}This PO is subject to {{ partner.name }} general purchasing conditions. Acknowledge within 2 working days.</div>
+</body></html>

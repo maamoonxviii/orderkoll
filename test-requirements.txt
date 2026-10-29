@@ -1,0 +1,2 @@
+# OCA dependencies of orderkoll_tier_glue (installed by CI)
+odoo-addon-sale-tier-validation==18.0.*

@@ -1,0 +1,31 @@
+From: James Hartley <j.hartley@albiontools.example>
+To: orders@orderkoll-demo.example
+Subject: Purchase order AT/2026/0318 - Albion Tools Ltd
+Date: Sun, 04 Oct 2026 09:30:00 +0200
+Message-ID: <179269247465.153077.16332144661380171333@albiontools.example>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+
+Hello,
+
+Please find our purchase order AT/2026/0318 below.
+
+- 4 Units AT-24286 PP elbow 90° 40 mm grey @ 17.44 GBP
+- 10 Units OK-1066 PVC pipe 32 mm grey @ 26.75 GBP
+- 200 m AT-66330 Cable gland M20 black @ 48.94 GBP
+
+Subtotal: 10,125.26 GBP
+Total incl. VAT: 12,150.31 GBP
+Requested delivery: 2026-10-15
+
+Best regards,
+James Hartley
+Albion Tools Ltd
+14 Foundry Lane, S9 3TY Sheffield
+
+-----Original Message-----
+From: orders@orderkoll-demo.example
+Subject: Re: price list 2026
+> Thanks for the updated price list, we will send the next order shortly.
+> Regards

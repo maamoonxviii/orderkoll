@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <record id="view_map_sku_form" model="ir.ui.view">
+        <field name="name">orderkoll.map_sku.form</field>
+        <field name="model">orderkoll.map_sku</field>
+        <field name="arch" type="xml">
+            <form>
+                <p
+          class="text-muted"
+        >Which of your products does this line mean?</p>
+                <group>
+                    <field name="line_id" invisible="1" />
+                    <field name="can_remember" invisible="1" />
+                    <field name="partner_id" readonly="1" />
+                    <field name="customer_code" readonly="1" />
+                    <field name="description" readonly="1" />
+                    <field name="quantity" readonly="1" />
+                    <field name="unit_price" readonly="1" />
+                    <field name="product_id" options="{'no_create': True}" />
+                    <field name="remember" invisible="not can_remember" />
+                </group>
+                <footer>
+                    <button
+            name="action_map"
+            type="object"
+            string="Use this product"
+            class="btn-primary"
+          />
+                    <button
+            string="Cancel"
+            class="btn-secondary"
+            special="cancel"
+          />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

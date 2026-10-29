@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo noupdate="1">
+    <record id="cron_fetch_mail" model="ir.cron">
+        <field name="name">Orderkoll: fetch purchase orders by IMAP</field>
+        <field name="model_id" ref="model_orderkoll_inbox" />
+        <field name="state">code</field>
+        <field name="code">model._cron_fetch_all()</field>
+        <field name="interval_number">2</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+    <record id="cron_process_pending" model="ir.cron">
+        <field name="name">Orderkoll: process pending documents</field>
+        <field name="model_id" ref="model_orderkoll_document" />
+        <field name="state">code</field>
+        <field name="code">model._cron_process_pending()</field>
+        <field name="interval_number">2</field>
+        <field name="interval_type">minutes</field>
+        <field name="active">True</field>
+    </record>
+</odoo>

@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_orderkoll_inbox_user,orderkoll.inbox user,model_orderkoll_inbox,group_orderkoll_user,1,0,0,0
+access_orderkoll_inbox_manager,orderkoll.inbox manager,model_orderkoll_inbox,group_orderkoll_manager,1,1,1,1
+access_orderkoll_document_user,orderkoll.document user,model_orderkoll_document,group_orderkoll_user,1,1,1,0
+access_orderkoll_document_manager,orderkoll.document manager,model_orderkoll_document,group_orderkoll_manager,1,1,1,1
+access_orderkoll_line_user,orderkoll.line user,model_orderkoll_line,group_orderkoll_user,1,1,1,1
+access_orderkoll_line_manager,orderkoll.line manager,model_orderkoll_line,group_orderkoll_manager,1,1,1,1
+access_orderkoll_sku_map_user,orderkoll.sku_map user,model_orderkoll_sku_map,group_orderkoll_user,1,1,1,0
+access_orderkoll_sku_map_manager,orderkoll.sku_map manager,model_orderkoll_sku_map,group_orderkoll_manager,1,1,1,1
+access_orderkoll_pick_partner_user,orderkoll.pick_partner user,model_orderkoll_pick_partner,group_orderkoll_user,1,1,1,1
+access_orderkoll_map_sku_user,orderkoll.map_sku user,model_orderkoll_map_sku,group_orderkoll_user,1,1,1,1
+access_orderkoll_reject_user,orderkoll.reject user,model_orderkoll_reject,group_orderkoll_user,1,1,1,1

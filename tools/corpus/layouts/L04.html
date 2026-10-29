@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Order {{ po.po_number }}</title>
+<style>
+@page { size: A4; margin: 25mm 20mm; }
+body { font-family: "Times New Roman", "DejaVu Serif", serif; font-size: 11pt; color: #000; line-height: 1.35; }
+.addr { margin-bottom: 18px; }
+.right { text-align: right; }
+h2 { font-size: 13pt; margin: 14px 0 6px; }
+table.l { width: 100%; border-collapse: collapse; }
+table.l th, table.l td { border: 1px solid #000; padding: 4px 6px; }
+table.l th { background: #eee; font-weight: bold; text-align: left; }
+.r { text-align: right; }
+p.tot { text-align: right; margin: 8px 0 0; }
+</style></head><body>
+<div class="addr">{{ partner.name }}<br>{{ partner.street }}<br>{{ partner.zip }} {{ partner.city }}{% if partner.vat %}<br>VAT ID {{ partner.vat }}{% endif %}</div>
+<div class="right">{{ partner.city }}, {{ po_date }}</div>
+<div class="addr">To:<br>{{ company.name }}<br>{{ company.street }}<br>{{ company.zip }} {{ company.city }}</div>
+<h2>Order {{ po.po_number }}</h2>
+<p>Dear Sir or Madam,<br>we hereby order the following goods for delivery on {{ requested_date }} to {{ po.ship_to }}. Prices in {{ cur }} as per our agreed price list.</p>
+<table class="l">
+<tr><th>Description</th><th>Ref.</th><th class="r">Quantity</th><th class="r">Price/unit</th><th class="r">Total</th></tr>
+{% for l in lines %}<tr><td>{{ l.desc }}</td><td>{{ l.code }}</td><td class="r">{{ l.qty }} {{ l.uom }}</td><td class="r">{{ l.price }}</td><td class="r">{{ l.total }}</td></tr>
+{% endfor %}
+</table>
+<p class="tot">Net amount: {{ subtotal }} {{ cur }}<br>VAT {{ tax_pct }}%: {{ tax }} {{ cur }}<br><b>Total amount: {{ total }} {{ cur }}</b></p>
+<p>{% if po.notes %}{{ po.notes }} {% endif %}Please confirm receipt of this order by e-mail to {{ po.buyer_email }}.</p>
+<p>Kind regards,<br>{{ partner.name }}</p>
+</body></html>

@@ -1,0 +1,23 @@
+// Review screen: the purchase order on the left, at a readable height.
+.o_orderkoll_review {
+  .o_orderkoll_preview {
+    .o_field_pdf_viewer,
+    .o_pdfview_iframe {
+      width: 100%;
+    }
+    .o_pdfview_iframe {
+      height: 75vh;
+      min-height: 480px;
+      border: 1px solid var(--border-color, #dee2e6);
+    }
+    .o_orderkoll_source_text {
+      display: block;
+      max-height: 75vh;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color, #dee2e6);
+    }
+  }
+}

@@ -1,0 +1,114 @@
+<section class="oe_container">
+  <div class="oe_row">
+    <img class="oe_picture" src="banner.png" alt="Orderkoll by maamoon mara" style="width: 100%; border-radius: 12px;">
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <h2 class="oe_slogan">Orderkoll</h2>
+    <h3 class="oe_slogan">Emailed purchase orders into draft quotations, checked and approved by a person</h3>
+  </div>
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <p>
+        Your customers email purchase orders as PDF, Excel, CSV or plain text, and someone
+        retypes them into Odoo. Orderkoll takes each mail, keeps the original file, finds the
+        customer from the sender, matches their item codes to your products, and prepares a
+        document that a person reviews before a quotation exists.
+        <b>Nothing is confirmed automatically.</b>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <h3 class="oe_slogan">The review screen</h3>
+    <div class="oe_span12">
+      <img class="oe_picture oe_screenshot" src="review_screenshot.png" alt="A purchase order held for one unknown item code, with Map on the yellow line">
+      <p class="oe_mt16">
+        The purchase order beside its lines, and a plain-language To-do box that says what
+        stops it. Here one item code is unknown: click <b>Map</b>, pick the product once, and
+        Orderkoll remembers it for this customer.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <h3>What the free module does</h3>
+      <ul>
+        <li>Intake from a mail alias (Odoo's own incoming mail) or by IMAP from a mailbox that only receives purchase orders</li>
+        <li>One document per mail: the original file, the sender, and the text extracted from it (text PDFs, Excel, CSV, the email body; scanned PDFs through optional OCR, always routed to a person)</li>
+        <li>The customer from the sender: exact email, then domain, never webmail domains</li>
+        <li>Each line's product: customer code memory, internal reference, barcode, then name similarity</li>
+        <li>Review screen with Map product, Pick customer and Reject with a reason; every edit re-runs the checks</li>
+        <li>Create quotation: a draft sales order with the PO number as customer reference, the original file attached and every check in the chatter</li>
+        <li>A task for the responsible person when a document fails, optional Telegram or webhook alerts, and a heartbeat URL for your monitor</li>
+        <li>Two user groups (order desk, manager) and per-company rules</li>
+      </ul>
+    </div>
+    <div class="oe_span6">
+      <h3>What it does not do on its own</h3>
+      <p>
+        Reading the order lines out of the document needs an extraction engine. Without one,
+        the lines are typed on the review screen and everything else above works the same.
+        The AI extraction engine and the price, totals and duplicate checks are in the
+        separate module <b>Orderkoll Pro</b>.
+      </p>
+      <h3 class="oe_mt32">Your data</h3>
+      <p>
+        The free module sends nothing outside your Odoo, except the alerts you switch on
+        yourself (Telegram, or a webhook URL you enter), which carry only the document number,
+        the inbox name and a link back to it.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <img class="oe_picture oe_screenshot" src="ready.png" alt="A clean document ready to become a quotation">
+      <p class="oe_mt16">A clean document: one click on <b>Create quotation</b>.</p>
+    </div>
+    <div class="oe_span6">
+      <img class="oe_picture oe_screenshot" src="quotation.png" alt="The draft quotation with the purchase order attached and the checks in the chatter">
+      <p class="oe_mt16">The draft quotation, with the purchase order attached and every check written in the chatter.</p>
+    </div>
+  </div>
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <img class="oe_picture oe_screenshot" src="code_memory.png" alt="Customer code memory">
+      <p class="oe_mt16">Customer code memory: each customer's own item codes, mapped once.</p>
+    </div>
+    <div class="oe_span6">
+      <img class="oe_picture oe_screenshot" src="inbox.png" alt="Inbox configuration">
+      <p class="oe_mt16">An inbox: mail alias or IMAP, the responsible person, and the price source for quotations.</p>
+    </div>
+  </div>
+  <div class="oe_row">
+    <p class="oe_mt16"><i>Screens shown with Orderkoll Pro installed. The free module shows the same screens without the price, totals and duplicate checks.</i></p>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h3>Compatibility</h3>
+      <p>Odoo 18.0 Community, on your own server. Odoo Online does not allow custom modules.
+      Python packages: <code>pdfplumber</code>, <code>pypdf</code>, <code>openpyxl</code>; optional <code>pytesseract</code> with Tesseract for scanned PDFs.</p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <p class="text-center" style="font-family: monospace; color: #4e5a68;">
+      maamoon mara<span style="color: #1a5cff;">.</span> — built and supported by Maamoon Mara, Gothenburg, Sweden
+    </p>
+  </div>
+</section>
