@@ -22,6 +22,8 @@ _logger = logging.getLogger(__name__)
 MAX_PAGES = 50
 MAX_ROWS = 5000
 MAX_CHARS = 300_000
+MAX_UNZIPPED = 50 * 1024 * 1024  # an .xlsx is a zip: refuse "zip bombs"
+MAX_ZIP_RATIO = 100
 
 SOURCE_TYPES = ("pdf", "xlsx", "csv", "email_body")
 _PDF_MIMES = {"application/pdf", "application/x-pdf"}
@@ -185,10 +187,27 @@ def _cell(value) -> str:
     return str(value).strip()
 
 
+def check_zip_size(data: bytes) -> None:
+    """ValueError for a "zip bomb": a tiny file that unzips to an enormous one.
+    The sizes in the zip directory are a hard limit: Python's zipfile never returns more."""
+    import zipfile
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as zf:
+            unzipped = sum(info.file_size for info in zf.infolist())
+    except zipfile.BadZipFile as exc:
+        raise ValueError("not a valid .xlsx file") from exc
+    if unzipped > MAX_UNZIPPED or unzipped > max(len(data), 1) * MAX_ZIP_RATIO:
+        raise ValueError(
+            f"spreadsheet refused: {len(data)} bytes unzip to {unzipped} bytes (zip bomb)"
+        )
+
+
 def extract_xlsx_text(data: bytes) -> str:
     """All sheets as CSV text, empty rows dropped, one '## Sheet:' header per sheet."""
     import openpyxl
 
+    check_zip_size(data)
     workbook = openpyxl.load_workbook(io.BytesIO(data), read_only=True, data_only=True)
     out = io.StringIO()
     writer = csv.writer(out, lineterminator="\n")

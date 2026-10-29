@@ -13,8 +13,6 @@
         "security/ir.model.access.csv",
         "views/inbox_views.xml",
     ],
-    # OCA base_tier_validation / sale_tier_validation have no 19.0 release yet (2026-10-26):
-    # installable again once they do.
-    "installable": False,
+    "installable": True,
     "auto_install": False,
 }

@@ -7,12 +7,13 @@ the printed total, flags repeated PO numbers, and stops anything doubtful for a 
 Nothing is confirmed automatically.
 
 Status: **beta** (October 2026), Odoo 19.0 Community (this branch; Odoo 18.0 on
-the `18.0` branch). On the [Odoo App Store](https://apps.odoo.com/apps/modules/19.0/orderkoll_core).
+the `18.0` branch). On the
+[Odoo App Store](https://apps.odoo.com/apps/modules/19.0/orderkoll_core).
 
 | Directory | What | Licence |
 |---|---|---|
 | `orderkoll_core/` | the free module: inbox (mail alias or IMAP), documents, text extraction, customer and product matching, review screen, quotation creation, alerts | LGPL-3 |
-| `orderkoll_tier_glue/` | optional: checked orders become quotations that wait for OCA tier validation (Odoo 18.0 only for now: OCA's `sale_tier_validation` has no 19.0 release yet) | AGPL-3 |
+| `orderkoll_tier_glue/` | optional: checked orders become quotations that wait for OCA tier validation | AGPL-3 |
 | `n8n/` | Slack / Teams approval workflow templates | MIT |
 | `tools/` | synthetic test-PO generator, demo data, accuracy scorer | MIT |
 | `docs/` | install details, [review guide for the order desk](docs/review-guide.md) | — |

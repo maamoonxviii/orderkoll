@@ -41,8 +41,8 @@ the server, port 25 open, and a transport that pipes that one domain into
 `odoo-mailgate.py` (shipped with Odoo). Or create an Incoming Mail Server in Odoo that reads
 a dedicated mailbox and routes it to the alias.
 
-Optional: `orderkoll_tier_glue` (AGPL-3) if you already run OCA `sale_tier_validation`: on
-Odoo 18.0 only for now, until OCA releases `sale_tier_validation` for 19.0.
+Optional: `orderkoll_tier_glue` (AGPL-3) if you already run OCA `sale_tier_validation`
+(from the OCA `tier-validation` repository on 19.0).
 
 Installing Orderkoll turns on Odoo's **Pricelists** feature (Sales → Settings): from Odoo 19
 a customer's pricelist is ignored while it is off, and Orderkoll checks every price against

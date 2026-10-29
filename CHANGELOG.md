@@ -2,8 +2,12 @@
 
 All user-visible changes, newest first. Odoo-style tags: ADD, IMP, FIX, REM.
 
-## Unreleased (19.0)
+## 19.0.1.0.1 (2026-10-29)
 
+- [ADD] orderkoll_tier_glue is installable on 19.0 again: OCA's `sale_tier_validation` now has a
+  19.0 release (in the OCA `tier-validation` repository).
+- [FIX] orderkoll_core: a spreadsheet that unzips to more than 50 MB, or to over 100 times its own
+  size (a "zip bomb"), is refused before it is opened, instead of filling the server's memory.
 - [IMP] orderkoll_core: the store page and cover say Community (Enterprise is listed again once it
   has been tested on Enterprise).
 - [FIX] orderkoll_core: a unit set on a document line reaches the quotation on Odoo 19

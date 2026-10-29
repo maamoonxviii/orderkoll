@@ -1,6 +1,8 @@
 # Copyright 2026 Maamoon Mara
 # License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
+import io
 import unittest
+import zipfile
 from unittest import mock
 
 try:
@@ -99,6 +101,24 @@ class TestSpreadsheetText(unittest.TestCase):
         self.assertIn("Description,Our code,Qty,Unit price,Line total", text)
         self.assertIn("Cutting disc T30 grade 40,NF-40524,50,1103.9,55195", text)
         self.assertIn(",,,,Total,429169.74", text)
+
+    def test_xlsx_zip_bomb_is_refused(self):
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("[Content_Types].xml", "<Types/>")
+            zf.writestr("xl/worksheets/sheet1.xml", b"0" * 5_000_000)  # ~5 kB zipped
+        with self.assertRaisesRegex(ValueError, "zip bomb"):
+            extract.extract_xlsx_text(buf.getvalue())
+
+    def test_xlsx_over_the_size_cap_is_refused(self):
+        data = (DATA / "xlsx-1.xlsx").read_bytes()
+        with mock.patch.object(extract, "MAX_UNZIPPED", 1000):
+            with self.assertRaisesRegex(ValueError, "zip bomb"):
+                extract.extract_xlsx_text(data)
+
+    def test_not_a_zip_is_refused(self):
+        with self.assertRaisesRegex(ValueError, "not a valid .xlsx"):
+            extract.extract_xlsx_text(b"not a spreadsheet")
 
     def test_csv_is_decoded_and_normalised(self):
         self.assertEqual(extract.extract_csv_text(b"code;qty\r\nA-1;5\r\n"), "code;qty\nA-1;5")
