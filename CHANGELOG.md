@@ -4,6 +4,8 @@ All user-visible changes, newest first. Odoo-style tags: ADD, IMP, FIX, REM.
 
 ## Unreleased (20.0)
 
+- [FIX] orderkoll_core: attachments on a reply to a document's mail thread are stored sanitised
+  like new mail (an .html or .svg can no longer be opened as a page in Odoo).
 - [MIG] orderkoll_core 20.0.1.0.2: Odoo 20.0, with every 19.0 change up to 19.0.1.0.2. README, install guide, store page and cover say Odoo 20.
 - [REM] orderkoll_tier_glue is not installable on 20.0 until OCA releases `sale_tier_validation` for 20.0.
 

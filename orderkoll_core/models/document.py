@@ -203,7 +203,14 @@ class OrderkollDocument(models.Model):
         return document
 
     def message_update(self, msg_dict, update_vals=None):
-        """A reply on a document's thread is just a chatter message; nothing to change."""
+        """A reply on a document's thread is just a chatter message; nothing to change.
+        Its attachments get the same treatment as new mail: sanitised copies on the
+        document, never the originals (browser-renderable types) on the message."""
+        for document in self:
+            mail = document.inbox_id._fetched_mail_from_msg_dict(msg_dict)
+            for attachment in mail.attachments:
+                document.inbox_id._make_attachment(document, attachment)
+        msg_dict["attachments"] = []
         return True
 
     # ------------------------------------------------------------- checks log
