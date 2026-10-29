@@ -1,0 +1,199 @@
+{
+  "name": "Orderkoll: approval request → Slack",
+  "nodes": [
+    {
+      "id": "e77634a9-2f3d-5b58-ac8b-f6a1097f9039",
+      "name": "From Odoo",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orderkoll-approval",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "webhookId": "161c4abd-de92-574f-9778-6572ce0e9905"
+    },
+    {
+      "id": "7e6f2801-3198-590a-ac07-9245b5c2389d",
+      "name": "Expected signature",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{ $json.body.ts }}.{{ $json.body.data }}",
+        "dataPropertyName": "expected",
+        "encoding": "hex"
+      },
+      "credentials": {
+        "crypto": {
+          "id": "__CRED_ORDERKOLL_WEBHOOK_SECRET__",
+          "name": "Orderkoll webhook secret"
+        }
+      }
+    },
+    {
+      "id": "1a85d939-86fa-57cf-8f66-8cfc3ff2ac0b",
+      "name": "Check and build message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "parameters": {
+        "jsCode": "// Odoo sends {ts, data, sig}: data is the payload as JSON text, sig = HMAC(ts + \".\" + data).\nconst it = $input.first().json;\nconst body = it.body || {};\nconst fresh = Math.abs(Date.now() / 1000 - Number(body.ts)) < 300;\nif (!fresh || !body.sig || it.expected !== body.sig) {\n  return [{ json: { ok: false } }];\n}\nconst p = JSON.parse(body.data);\nconst d = p.document;\n// Document text comes from emails anyone can send: escape it so it cannot become a link.\nconst esc = (v) => String(v ?? '')\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst money = (n) => Number(n || 0).toFixed(2);\nconst docUrl = '__ODOO_BASE_URL__/odoo/action-orderkoll_core.action_document/' + Number(d.id);\nconst shown = d.lines || [];\nlet lines = shown\n  .map((l) => `• ${Number(l.quantity)} × ${esc(l.product || l.description)}`\n    + ` @ ${money(l.unit_price)}`)\n  .join('\\n');\nif (d.line_count > shown.length) lines += `\\n…and ${d.line_count - shown.length} more`;\nconst head =\n  `*Purchase order ${esc(d.po_number || d.name)}* from *${esc(d.customer)}*\\n` +\n  `Total ${money(d.total)} ${esc(d.currency)} · ${Number(d.line_count)} lines · every check passed`;\nconst blocks = [\n  { type: 'section', text: { type: 'mrkdwn', text: head } },\n  { type: 'section', text: { type: 'mrkdwn', text: (lines || '_no lines_').slice(0, 2900) } },\n  { type: 'context', elements: [{ type: 'mrkdwn',\n    text: `<${docUrl}|Open in Odoo> · button valid until ${esc(p.expires_at)} UTC` }] },\n  {\n    type: 'actions',\n    elements: [\n      { type: 'button', style: 'primary', action_id: 'orderkoll_approve', value: p.callback_url,\n        text: { type: 'plain_text', text: 'Approve: create quotation' } },\n      { type: 'button', style: 'danger', action_id: 'orderkoll_reject', value: p.callback_url,\n        text: { type: 'plain_text', text: 'Reject' },\n        confirm: {\n          title: { type: 'plain_text', text: 'Reject this order?' },\n          text: { type: 'mrkdwn', text: 'The document is marked rejected in Odoo.' },\n          confirm: { type: 'plain_text', text: 'Reject' },\n          deny: { type: 'plain_text', text: 'Cancel' },\n        } },\n    ],\n  },\n];\nreturn [{ json: { ok: true, slack: {\n  channel: '__SLACK_CHANNEL__',\n  text: `PO ${esc(d.po_number || d.name)} from ${esc(d.customer)} is ready for approval`,\n  blocks,\n} } }];"
+      }
+    },
+    {
+      "id": "f4cbac7a-5503-599a-a17b-be28be4554ed",
+      "name": "Signed by Odoo?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51b0decd-d5e8-54d1-a59f-b2f41901a715",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f7068b05-f5f0-54e2-9b53-340fe0fdc90e",
+      "name": "Post to Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, -100],
+      "parameters": {
+        "method": "POST",
+        "url": "https://slack.com/api/chat.postMessage",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "slackApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.slack) }}",
+        "options": {}
+      },
+      "credentials": {
+        "slackApi": {
+          "id": "__CRED_ORDERKOLL_SLACK_BOT__",
+          "name": "Orderkoll Slack bot"
+        }
+      }
+    },
+    {
+      "id": "7aa086e1-6ea4-5c91-bf89-0ff5923c3ce2",
+      "name": "Answer Odoo",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1100, -100],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: $json.ok === true, slack_error: $json.error || null }) }}",
+        "options": {
+          "responseCode": "={{ $json.ok === true ? 200 : 502 }}"
+        }
+      }
+    },
+    {
+      "id": "5204bb01-3f21-5938-9544-0d7ee1a0c08e",
+      "name": "Refuse",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [880, 120],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false }) }}",
+        "options": {
+          "responseCode": 401
+        }
+      }
+    }
+  ],
+  "connections": {
+    "From Odoo": {
+      "main": [
+        [
+          {
+            "node": "Expected signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Expected signature": {
+      "main": [
+        [
+          {
+            "node": "Check and build message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check and build message": {
+      "main": [
+        [
+          {
+            "node": "Signed by Odoo?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signed by Odoo?": {
+      "main": [
+        [
+          {
+            "node": "Post to Slack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Refuse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Slack": {
+      "main": [
+        [
+          {
+            "node": "Answer Odoo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

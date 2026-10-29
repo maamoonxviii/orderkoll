@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <!-- Orderkoll checks every price against the customer's own pricelist. From Odoo 19 a
+         customer's pricelist is ignored while the Pricelists feature is off, so installing
+         Orderkoll turns it on, the same way Sales settings → Pricelists does. -->
+    <record id="base.group_user" model="res.groups">
+        <field
+      name="implied_ids"
+      eval="[(4, ref('product.group_product_pricelist'))]"
+    />
+    </record>
+    <function
+    model="res.company"
+    name="_activate_or_create_pricelists"
+    eval="[[]]"
+  />
+</odoo>

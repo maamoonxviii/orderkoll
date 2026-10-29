@@ -1,0 +1,32 @@
+// Review screen: the purchase order on the left, at a readable height.
+.o_orderkoll_review {
+  .o_orderkoll_preview {
+    .o_field_pdf_viewer,
+    .o_pdfview_iframe {
+      width: 100%;
+    }
+    .o_pdfview_iframe {
+      height: 75vh;
+      min-height: 480px;
+      border: 1px solid var(--border-color, #dee2e6);
+    }
+    .o_orderkoll_source_text {
+      display: block;
+      max-height: 75vh;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color, #dee2e6);
+    }
+  }
+}
+
+// Odoo 19 puts the PDF beside the form from 1400 px wide (Odoo 18: from 1534 px). On
+// 1400–1533 px screens that squeezed the order lines until descriptions were cut and the
+// Code column scrolled out of view. Below 1534 px the PDF stays in the Original tab, as on 18.
+@media (max-width: 1533.98px) {
+  .o_orderkoll_review .o_form_renderer > .o_attachment_preview {
+    display: none !important;
+  }
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>PO {{ po.po_number }}</title>
+<style>
+@page { size: Letter; margin: 0.5in; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 9.5pt; color: #333; }
+.top { display: flex; justify-content: space-between; margin-bottom: 10px; }
+.top h1 { margin: 0; font-size: 22pt; color: #2e7d32; }
+.top .num { font-size: 11pt; text-align: right; }
+.cols { display: flex; gap: 12px; margin-bottom: 12px; }
+.card { flex: 1; border: 1px solid #c8e6c9; border-radius: 4px; padding: 8px; background: #f1f8e9; }
+.card h5 { margin: 0 0 4px; font-size: 8.5pt; color: #2e7d32; }
+table { width: 100%; border-collapse: collapse; }
+thead th { background: #2e7d32; color: #fff; padding: 6px; text-align: left; font-size: 9pt; }
+tbody tr:nth-child(odd) td { background: #f9fbf9; }
+td { padding: 5px 6px; border-bottom: 1px solid #e0e0e0; }
+.r { text-align: right; }
+.summary { margin-top: 10px; display: flex; justify-content: flex-end; }
+.summary table { width: 2.6in; }
+.summary td { border: 0; padding: 2px 6px; }
+.summary .g td { background: #2e7d32; color: #fff; font-weight: bold; }
+.note { margin-top: 14px; font-size: 8.5pt; color: #666; }
+</style></head><body>
+<div class="top"><div><h1>PURCHASE ORDER</h1><div style="margin-top:6px">{{ logo }}</div></div><div class="num"><b>PO {{ po.po_number }}</b><br>Date: {{ po_date }}<br>Currency: {{ cur }}</div></div>
+<div class="cols">
+  <div class="card"><h5>BILL TO</h5>{{ partner.name }}<br>{{ partner.street }}<br>{{ partner.zip }} {{ partner.city }}{% if partner.vat %}<br>{{ partner.vat }}{% endif %}</div>
+  <div class="card"><h5>SHIP TO</h5>{{ po.ship_to }}<br>Requested: {{ requested_date }}</div>
+  <div class="card"><h5>VENDOR</h5>{{ company.name }}<br>{{ company.street }}<br>{{ company.zip }} {{ company.city }}<br>{{ company.email }}</div>
+</div>
+<table>
+<thead><tr><th>#</th><th>SKU</th><th>Description</th><th class="r">Qty</th><th>UoM</th><th class="r">Unit Price</th><th class="r">Ext. Price</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr><td>{{ l.pos }}</td><td>{{ l.code }}</td><td>{{ l.desc }}</td><td class="r">{{ l.qty }}</td><td>{{ l.uom }}</td><td class="r">{{ l.price }}</td><td class="r">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody></table>
+<div class="summary"><table>
+<tr><td>Subtotal</td><td class="r">{{ subtotal }}</td></tr>
+<tr><td>Tax ({{ tax_pct }}%)</td><td class="r">{{ tax }}</td></tr>
+<tr class="g"><td>TOTAL {{ cur }}</td><td class="r">{{ total }}</td></tr>
+</table></div>
+<div class="note">Contact: {{ po.buyer_email }}{% if po.notes %} · {{ po.notes }}{% endif %}</div>
+</body></html>

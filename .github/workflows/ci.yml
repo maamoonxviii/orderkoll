@@ -1,0 +1,70 @@
+name: CI
+
+# Once per pull request (private repositories have limited CI minutes); manual runs allowed.
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - uses: pre-commit/action@v3.0.1
+
+  tools-tests:
+    name: corpus tools (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: WeasyPrint system libraries
+        run: sudo apt-get update -q && sudo apt-get install -y -q libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0
+      - run: pip install -r tools/requirements.txt
+      - run: python -m pytest tools/tests -q
+
+  odoo-tests:
+    name: Odoo 19.0 module tests
+    runs-on: ubuntu-latest
+    container: ghcr.io/oca/oca-ci/py3.10-odoo19.0:latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: odoo
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Any module to test?
+        id: mods
+        run: |
+          if ls */__manifest__.py >/dev/null 2>&1; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "present=false" >> "$GITHUB_OUTPUT"; fi
+      - name: Install addons and dependencies
+        if: steps.mods.outputs.present == 'true'
+        run: oca_install_addons
+      - name: Python dependencies of the modules (after oca_install_addons, which resets the venv)
+        if: steps.mods.outputs.present == 'true'
+        run: pip install -r requirements.txt -U "pyOpenSSL>=24.2" "cryptography>=42" "urllib3>=1.26.20,<2"
+      - name: Check licenses
+        if: steps.mods.outputs.present == 'true'
+        run: manifestoo -d . check-licenses
+      - name: Initialize test db
+        if: steps.mods.outputs.present == 'true'
+        run: oca_init_test_database
+      - name: Run tests
+        if: steps.mods.outputs.present == 'true'
+        run: oca_run_tests
+      - name: No modules yet
+        if: steps.mods.outputs.present == 'false'
+        run: echo "no __manifest__.py yet; Odoo tests skipped"

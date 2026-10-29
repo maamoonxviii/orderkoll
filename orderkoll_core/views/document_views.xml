@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <record id="view_document_list" model="ir.ui.view">
+        <field name="name">orderkoll.document.list</field>
+        <field name="model">orderkoll.document</field>
+        <field name="arch" type="xml">
+            <list
+        decoration-danger="state == 'error'"
+        decoration-warning="state == 'needs_review'"
+        decoration-muted="state == 'rejected'"
+      >
+                <field name="create_date" string="Received" />
+                <field name="name" />
+                <field name="partner_id" />
+                <field name="sender_email" optional="show" />
+                <field name="source_type" optional="hide" />
+                <field name="po_number" />
+                <field name="document_total" />
+                <field name="line_count" optional="show" />
+                <field
+          name="state"
+          widget="badge"
+          decoration-warning="state == 'needs_review'"
+          decoration-success="state in ('ready', 'created')"
+          decoration-danger="state == 'error'"
+          decoration-info="state in ('new', 'extracting')"
+        />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_document_form" model="ir.ui.view">
+        <field name="name">orderkoll.document.form</field>
+        <field name="model">orderkoll.document</field>
+        <field name="arch" type="xml">
+            <form class="o_orderkoll_review">
+                <header>
+                    <button
+            name="action_create_quotation"
+            type="object"
+            string="Create quotation"
+            class="btn-primary"
+            invisible="state != 'ready'"
+          />
+                    <button
+            name="action_open_pick_partner"
+            type="object"
+            string="Pick customer"
+            class="btn-primary"
+            invisible="partner_id or state != 'needs_review'"
+          />
+                    <button
+            name="action_mark_scan_checked"
+            type="object"
+            string="Mark scan as checked"
+            class="btn-primary"
+            invisible="state != 'needs_review' or extraction_method != 'ocr' or scan_checked"
+          />
+                    <button
+            name="action_process"
+            type="object"
+            string="Process"
+            class="btn-primary"
+            invisible="state not in ('new', 'error')"
+          />
+                    <button
+            name="action_open_pick_partner"
+            type="object"
+            string="Change customer"
+            invisible="not partner_id or state not in ('needs_review', 'ready')"
+          />
+                    <button
+            name="action_recheck"
+            type="object"
+            string="Re-check"
+            invisible="state not in ('needs_review', 'ready')"
+          />
+                    <button
+            name="action_rerun_extraction"
+            type="object"
+            string="Re-run extraction"
+            invisible="state in ('new', 'extracting', 'created', 'rejected')"
+            confirm="This reads the document again and replaces the lines, including your edits. Continue?"
+          />
+                    <button
+            name="action_reject"
+            type="object"
+            string="Reject"
+            invisible="state in ('created', 'rejected')"
+          />
+                    <field
+            name="state"
+            widget="statusbar"
+            statusbar_visible="new,needs_review,ready,created"
+          />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1" /></h1>
+                    </div>
+                    <field name="extraction_method" invisible="1" />
+                    <field name="scan_checked" invisible="1" />
+                    <field name="totals_checked" invisible="1" />
+                    <div
+            class="alert alert-warning"
+            role="alert"
+            invisible="state != 'needs_review' or not review_todo"
+          >
+                        <strong
+            >To do before this can become a quotation:</strong>
+                        <field name="review_todo" nolabel="1" readonly="1" />
+                    </div>
+                    <div
+            class="alert alert-success"
+            role="status"
+            invisible="state != 'ready'"
+          >
+                        <strong>All checks passed.</strong>
+                        This purchase order is ready to become a quotation.
+                    </div>
+                    <div
+            class="alert alert-secondary"
+            role="status"
+            invisible="state != 'rejected'"
+          >
+                        <strong>Rejected.</strong>
+                        <field name="reject_reason" nolabel="1" readonly="1" />
+                    </div>
+                    <div
+            class="alert alert-danger"
+            role="alert"
+            invisible="not error_message"
+          >
+                        <field name="error_message" readonly="1" />
+                    </div>
+                    <group>
+                        <group>
+                            <field
+                name="partner_id"
+                readonly="state not in ('needs_review', 'ready')"
+                options="{'no_create': True}"
+              />
+                            <field name="sender_email" readonly="1" />
+                            <field
+                name="po_number"
+                readonly="state not in ('needs_review', 'ready')"
+              />
+                            <field
+                name="po_date"
+                readonly="state not in ('needs_review', 'ready')"
+              />
+                            <field
+                name="requested_date"
+                readonly="state not in ('needs_review', 'ready')"
+              />
+                        </group>
+                        <group>
+                            <field name="currency_id" readonly="1" />
+                            <field
+                name="document_total"
+                string="Total on the PO"
+                readonly="state not in ('needs_review', 'ready')"
+              />
+                            <field
+                name="lines_total"
+                string="Sum of the lines"
+                readonly="1"
+              />
+                            <field
+                name="totals_ok"
+                string="Totals agree"
+                readonly="1"
+                invisible="not totals_checked"
+              />
+                            <field
+                name="duplicate_of_id"
+                readonly="1"
+                invisible="not duplicate_of_id"
+              />
+                            <field
+                name="sale_order_id"
+                readonly="1"
+                invisible="not sale_order_id"
+              />
+                        </group>
+                    </group>
+                    <field
+            name="line_ids"
+            readonly="state not in ('needs_review', 'ready')"
+          >
+                        <list
+              editable="bottom"
+              decoration-danger="status == 'price_mismatch'"
+              decoration-warning="status == 'needs_mapping'"
+            >
+                            <field name="sequence" widget="handle" />
+                            <field name="customer_code" string="Code" />
+                            <field name="description" />
+                            <field name="quantity" string="Qty" />
+                            <field name="uom_name" optional="hide" />
+                            <field name="unit_price" string="Price" />
+                            <field
+                name="line_total"
+                string="Total"
+                optional="show"
+              />
+                            <field
+                name="product_id"
+                options="{'no_create': True}"
+              />
+                            <field
+                name="status"
+                widget="badge"
+                width="130px"
+                decoration-success="status in ('ok', 'matched')"
+                decoration-warning="status == 'needs_mapping'"
+                decoration-danger="status == 'price_mismatch'"
+              />
+                            <field name="match_method" optional="hide" />
+                            <field name="pricelist_price" optional="hide" />
+                            <field name="deviation_pct" optional="hide" />
+                            <button
+                name="action_open_map_sku"
+                type="object"
+                string="Map"
+                title="Pick the product for this line and remember it for this customer"
+                icon="fa-link"
+                invisible="status != 'needs_mapping' and match_method != 'fuzzy'"
+              />
+                        </list>
+                    </field>
+                    <notebook>
+                        <page string="Original" name="original">
+                            <div class="o_orderkoll_preview">
+                                <field name="attachment_name" invisible="1" />
+                                <field
+                  name="attachment_datas"
+                  widget="pdf_viewer"
+                  filename="attachment_name"
+                  readonly="1"
+                  nolabel="1"
+                  invisible="source_type != 'pdf' or not attachment_id"
+                />
+                                <div
+                  class="mb-2"
+                  invisible="source_type == 'pdf' or not attachment_id"
+                >
+                                    <span class="text-muted">File: </span>
+                                    <field
+                    name="attachment_id"
+                    readonly="1"
+                    nolabel="1"
+                  />
+                                </div>
+                                <field
+                  name="email_body"
+                  nolabel="1"
+                  readonly="1"
+                  class="o_orderkoll_source_text"
+                  invisible="source_type != 'email_body'"
+                />
+                                <field
+                  name="raw_text"
+                  nolabel="1"
+                  readonly="1"
+                  class="o_orderkoll_source_text font-monospace"
+                  invisible="source_type in ('email_body', 'pdf')"
+                />
+                            </div>
+                        </page>
+                        <page string="Details" name="details">
+                            <group>
+                                <group string="Sender">
+                                    <field name="inbox_id" readonly="1" />
+                                    <field name="sender_name" readonly="1" />
+                                    <field name="sender_domain" readonly="1" />
+                                    <field
+                    name="partner_resolution"
+                    readonly="1"
+                  />
+                                </group>
+                                <group string="Mail">
+                                    <field name="source_type" readonly="1" />
+                                    <field name="email_subject" readonly="1" />
+                                    <field name="email_date" readonly="1" />
+                                    <field
+                    name="extra_attachment_ids"
+                    widget="many2many_binary"
+                    readonly="1"
+                  />
+                                </group>
+                            </group>
+                        </page>
+                        <page
+              string="Extracted text"
+              name="raw"
+              invisible="source_type != 'pdf'"
+            >
+                            <field
+                name="raw_text"
+                widget="text"
+                readonly="1"
+                class="font-monospace"
+              />
+                        </page>
+                        <page string="Checks" name="checks">
+                            <field
+                name="checks_log"
+                widget="text"
+                readonly="1"
+              />
+                        </page>
+                        <page
+              string="AI audit"
+              name="ai"
+              groups="orderkoll_core.group_orderkoll_manager"
+            >
+                            <group>
+                                <field name="llm_provider" readonly="1" />
+                                <field name="llm_model" readonly="1" />
+                                <field name="extraction_ms" readonly="1" />
+                                <field
+                  name="extraction_json"
+                  widget="text"
+                  readonly="1"
+                />
+                                <field
+                  name="llm_raw_response"
+                  widget="text"
+                  readonly="1"
+                />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <!-- wide screens: the purchase order beside the form, history below -->
+                <div class="o_attachment_preview" />
+                <chatter reload_on_attachment="True" />
+            </form>
+        </field>
+    </record>
+
+    <record id="view_document_search" model="ir.ui.view">
+        <field name="name">orderkoll.document.search</field>
+        <field name="model">orderkoll.document</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="po_number" />
+                <field name="sender_email" />
+                <field name="partner_id" />
+                <filter
+          name="to_do"
+          string="To do"
+          domain="[('state', 'in', ('needs_review', 'ready', 'error'))]"
+        />
+                <separator />
+                <filter
+          name="needs_review"
+          string="Needs review"
+          domain="[('state', '=', 'needs_review')]"
+        />
+                <filter
+          name="ready"
+          string="Ready"
+          domain="[('state', '=', 'ready')]"
+        />
+                <filter
+          name="created_today"
+          string="Created today"
+          domain="[('state', '=', 'created'), ('write_date', '>=', context_today().strftime('%Y-%m-%d'))]"
+        />
+                <filter
+          name="errors"
+          string="Errors"
+          domain="[('state', '=', 'error')]"
+        />
+                <group>
+                    <filter
+            name="group_partner"
+            string="Customer"
+            context="{'group_by': 'partner_id'}"
+          />
+                    <filter
+            name="group_state"
+            string="State"
+            context="{'group_by': 'state'}"
+          />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_document" model="ir.actions.act_window">
+        <field name="name">Documents</field>
+        <field name="res_model">orderkoll.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_document_search" />
+        <field name="context">{'search_default_to_do': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nothing to do</p>
+            <p>Purchase orders that arrive by email show up here.</p>
+        </field>
+    </record>
+</odoo>

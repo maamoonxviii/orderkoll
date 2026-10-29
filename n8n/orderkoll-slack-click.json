@@ -1,0 +1,386 @@
+{
+  "name": "Orderkoll: Slack button → Odoo",
+  "nodes": [
+    {
+      "id": "613e589e-eb94-5fb1-a1d2-8722fade92d1",
+      "name": "From Slack",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "orderkoll-slack",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "webhookId": "0b6a95ed-aba6-5efa-8fbe-b2a79dbc3001"
+    },
+    {
+      "id": "3b73a2e6-8a77-5f01-909e-c0f113c6b0b9",
+      "name": "Answer Slack",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [60, 120],
+      "parameters": {
+        "respondWith": "noData",
+        "options": {}
+      }
+    },
+    {
+      "id": "d5e1a6c1-04e1-5767-afcd-ef0657211a2b",
+      "name": "Raw text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [110, 0],
+      "parameters": {
+        "operation": "text",
+        "binaryPropertyName": "data",
+        "destinationKey": "raw",
+        "options": {}
+      }
+    },
+    {
+      "id": "fa82762a-4eb7-5d32-b079-ba6b96613e9e",
+      "name": "Raw body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0],
+      "parameters": {
+        "jsCode": "// Slack signs \"v0:\" + timestamp + \":\" + the raw form body; \"Raw text\" turned the webhook's\n// raw body into text (works whatever binary-data mode n8n runs in).\nconst headers = $('From Slack').first().json.headers;\nreturn [{ json: {\n  raw: String($input.first().json.raw || ''),\n  ts: headers['x-slack-request-timestamp'],\n  sig: headers['x-slack-signature'],\n} }];"
+      }
+    },
+    {
+      "id": "b36d0318-a5a3-58bf-ac55-77a8ca21a465",
+      "name": "Slack signature",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [440, 0],
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "=v0:{{ $json.ts }}:{{ $json.raw }}",
+        "dataPropertyName": "expected",
+        "encoding": "hex"
+      },
+      "credentials": {
+        "crypto": {
+          "id": "__CRED_ORDERKOLL_SLACK_SIGNING_SECRET__",
+          "name": "Orderkoll Slack signing secret"
+        }
+      }
+    },
+    {
+      "id": "917170b4-52cb-5134-9b38-8f43bcb730e0",
+      "name": "Check the click",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [660, 0],
+      "parameters": {
+        "jsCode": "const it = $input.first().json;\nconst fresh = Math.abs(Date.now() / 1000 - Number(it.ts)) < 300;\nif (!fresh || !it.sig || 'v0=' + it.expected !== it.sig) return [{ json: { ok: false } }];\nconst m = it.raw.match(/(?:^|&)payload=([^&]*)/);\nif (!m) return [{ json: { ok: false } }];\nconst payload = JSON.parse(decodeURIComponent(m[1].replace(/\\+/g, ' ')));\nconst action = (payload.actions || [])[0];\nconst allowed = '__ODOO_BASE_URL__/orderkoll/approve/';\nif (!action || !String(action.value || '').startsWith(allowed)) return [{ json: { ok: false } }];\n// Only your workspace, and (if listed) only the named approvers, may decide.\nif (!payload.team || payload.team.id !== '__SLACK_TEAM_ID__') return [{ json: { ok: false } }];\nconst uid = (payload.user && payload.user.id) || '';\nconst approvers = '__SLACK_APPROVER_IDS__'.split(',').map((x) => x.trim()).filter(Boolean);\nif (approvers.length && !approvers.includes(uid)) {\n  return [{ json: { ok: false, url: payload.response_url,\n    notice: 'You are not on the approver list for purchase orders.' } }];\n}\nconst name = (payload.user && (payload.user.name || payload.user.username)) || 'Slack user';\nconst who = `${name} (${uid})`;\nconst body = JSON.stringify({\n  action: action.action_id === 'orderkoll_approve' ? 'approve' : 'reject',\n  user: who,\n  token: String(action.value).split('/').pop(),  // the signature covers which request this is\n});\nreturn [{ json: {\n  ok: true, url: action.value, body, who,\n  ts: String(Math.floor(Date.now() / 1000)),\n  response_url: payload.response_url,\n  original: payload.message || {},\n} }];"
+      }
+    },
+    {
+      "id": "0fec3a35-9001-572c-87c9-aed4648c8378",
+      "name": "Signed by Slack?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [880, 0],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "51b0decd-d5e8-54d1-a59f-b2f41901a715",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "fdf02ab0-0ab5-51fe-841a-ca152e324a01",
+      "name": "Odoo signature",
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [1100, -100],
+      "parameters": {
+        "action": "hmac",
+        "type": "SHA256",
+        "value": "={{ $json.ts }}.{{ $json.body }}",
+        "dataPropertyName": "expected",
+        "encoding": "hex"
+      },
+      "credentials": {
+        "crypto": {
+          "id": "__CRED_ORDERKOLL_WEBHOOK_SECRET__",
+          "name": "Orderkoll webhook secret"
+        }
+      }
+    },
+    {
+      "id": "2410d4f2-209b-5d0a-8004-e7659dff9915",
+      "name": "Tell Odoo",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, -100],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Orderkoll-Timestamp",
+              "value": "={{ $json.ts }}"
+            },
+            {
+              "name": "X-Orderkoll-Signature",
+              "value": "={{ $json.expected }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $json.body }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "__CRED_ORDERKOLL_ODOO_BASIC_AUTH__",
+          "name": "Orderkoll Odoo basic auth"
+        }
+      }
+    },
+    {
+      "id": "0038195d-86c1-520b-8178-15339b63e241",
+      "name": "Slack update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1540, -100],
+      "parameters": {
+        "jsCode": "const r = $input.first().json;\nconst click = $('Check the click').first().json;\nlet res = r.body;\nif (typeof res === 'string') {\n  try { res = JSON.parse(res); } catch (e) { res = { message: res }; }\n}\nres = res || {};\nconst ok = r.statusCode === 200;\nconst esc = (v) => String(v ?? '')\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\nconst text = ok\n  ? `✅ ${esc(res.message)} (${esc(click.who)})`\n  : `⚠️ ${esc(res.message || 'Odoo answered ' + r.statusCode)}`;\nif (!ok) {\n  const msg = { response_type: 'ephemeral', replace_original: false, text };\n  return [{ json: { url: click.response_url, msg } }];\n}\nconst blocks = (click.original.blocks || []).filter((b) => b.type !== 'actions');\nblocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text }] });\nreturn [{ json: { url: click.response_url, msg: { replace_original: true, text, blocks } } }];"
+      }
+    },
+    {
+      "id": "fb3bdbc7-64dc-558a-b75c-76db90b880bc",
+      "name": "Has a notice?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1100, 120],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "58e8f632-6e88-5664-ae69-b98998d95696",
+              "leftValue": "={{ !!$json.notice }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "f33ee69f-0146-57d4-815c-5318bc6e8629",
+      "name": "Tell the clicker",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 120],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ response_type: 'ephemeral', replace_original: false, text: '⚠️ ' + $json.notice }) }}",
+        "options": {}
+      }
+    },
+    {
+      "id": "64bc151f-0a62-525a-aa89-cead3f7d7fab",
+      "name": "Update the message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1760, -100],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.msg) }}",
+        "options": {}
+      }
+    }
+  ],
+  "connections": {
+    "From Slack": {
+      "main": [
+        [
+          {
+            "node": "Answer Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer Slack": {
+      "main": [
+        [
+          {
+            "node": "Raw text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raw text": {
+      "main": [
+        [
+          {
+            "node": "Raw body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raw body": {
+      "main": [
+        [
+          {
+            "node": "Slack signature",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack signature": {
+      "main": [
+        [
+          {
+            "node": "Check the click",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check the click": {
+      "main": [
+        [
+          {
+            "node": "Signed by Slack?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signed by Slack?": {
+      "main": [
+        [
+          {
+            "node": "Odoo signature",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Has a notice?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has a notice?": {
+      "main": [
+        [
+          {
+            "node": "Tell the clicker",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Odoo signature": {
+      "main": [
+        [
+          {
+            "node": "Tell Odoo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tell Odoo": {
+      "main": [
+        [
+          {
+            "node": "Slack update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack update": {
+      "main": [
+        [
+          {
+            "node": "Update the message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

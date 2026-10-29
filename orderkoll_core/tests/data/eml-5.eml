@@ -1,0 +1,56 @@
+From: Katrin Vogel <k.vogel@rheinwerk-technik.example>
+To: orders@orderkoll-demo.example
+Subject: Purchase order 4500000929 - Rheinwerk Technik GmbH
+Date: Sat, 12 Sep 2026 09:30:00 +0200
+Message-ID:
+ <179269247465.153077.8802822471185546158@rheinwerk-technik.example>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============6305770647219412864=="
+
+--===============6305770647219412864==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+Hello,
+
+Please find our purchase order 4500000929 below.
+
+60 x Pipe coupling 50 mm PN10 (ref OK-1048) - unit price 37,30
+40 x Stretch film 500 mm black (ref OK-1154) - unit price 86,69
+5 x Threaded rod M16 zinc (ref OK-1034) - unit price 3,30
+200 x Drill bit HSS 125 mm grade 40 (ref OK-1166) - unit price 53,67
+
+Subtotal: 16.456,10 EUR
+Total incl. VAT: 19.582,76 EUR
+Requested delivery: 2026-09-29
+
+Best regards,
+Katrin Vogel
+Rheinwerk Technik GmbH
+Hafenstraße 22, 47119 Duisburg
+
+-----Original Message-----
+From: orders@orderkoll-demo.example
+Subject: Re: price list 2026
+> Thanks for the updated price list, we will send the next order shortly.
+> Regards
+
+--===============6305770647219412864==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body><p>Hello,</p><p></p><p>Please find our purchase order 4500000929 =
+below.</p><p></p><p>60 x Pipe coupling 50 mm PN10 (ref OK-1048) - unit price =
+37,30</p><p>40 x Stretch film 500 mm black (ref OK-1154) - unit price 86,69</=
+p><p>5 x Threaded rod M16 zinc (ref OK-1034) - unit price 3,30</p><p>200 x Dr=
+ill bit HSS 125 mm grade 40 (ref OK-1166) - unit price 53,67</p><p></p><p>Sub=
+total: 16.456,10 EUR</p><p>Total incl. VAT: 19.582,76 EUR</p><p>Requested del=
+ivery: 2026-09-29</p><p></p><p>Best regards,</p><p>Katrin Vogel</p><p>Rheinwe=
+rk Technik GmbH</p><p>Hafenstra=C3=9Fe 22, 47119 Duisburg</p><p></p><p>-----O=
+riginal Message-----</p><p>From: orders@orderkoll-demo.example</p><p>Subject:=
+ Re: price list 2026</p><p>> Thanks for the updated price list, we will send =
+the next order shortly.</p><p>> Regards</p></body></html>
+
+--===============6305770647219412864==--

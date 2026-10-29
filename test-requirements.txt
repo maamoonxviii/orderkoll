@@ -1,0 +1,3 @@
+# OCA dependencies of orderkoll_tier_glue (installed by CI).
+# 19.0: none yet. sale_tier_validation has no 19.0 release (2026-10-26) and the glue module is
+# not installable on this branch; add odoo-addon-sale-tier-validation==19.0.* when it ships.

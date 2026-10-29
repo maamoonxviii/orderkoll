@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 Maamoon Mara
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0). -->
+<odoo>
+    <record id="view_reject_form" model="ir.ui.view">
+        <field name="name">orderkoll.reject.form</field>
+        <field name="model">orderkoll.reject</field>
+        <field name="arch" type="xml">
+            <form>
+                <field name="document_ids" invisible="1" />
+                <p
+          class="text-muted"
+        >The reason is saved on the document and in its history.</p>
+                <field
+          name="reason"
+          nolabel="1"
+          placeholder="e.g. Duplicate of PO 4500000906, already entered by phone"
+        />
+                <footer>
+                    <button
+            name="action_reject"
+            type="object"
+            string="Reject"
+            class="btn-danger"
+          />
+                    <button
+            string="Cancel"
+            class="btn-secondary"
+            special="cancel"
+          />
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

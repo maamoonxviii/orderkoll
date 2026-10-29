@@ -1,0 +1,44 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>PO {{ po.po_number }}</title>
+<style>
+@page { size: Letter; margin: 0.6in 0.7in; }
+body { font-family: "DejaVu Sans", Verdana, sans-serif; font-size: 10pt; color: #111; }
+.band { background: #e8572a; color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; }
+.band h1 { margin: 0; font-size: 18pt; font-weight: 600; }
+.band .lg { background: #fff; border-radius: 4px; padding: 4px 8px; display: block; width: fit-content; margin-bottom: 6px; }
+.band .lg svg { display: block; }
+.band .meta { text-align: right; font-size: 10pt; line-height: 1.5; }
+.grid { display: flex; gap: 30px; margin: 16px 0 8px; }
+.grid div { flex: 1; font-size: 9.5pt; }
+.grid b { display: block; color: #e8572a; font-size: 8.5pt; text-transform: uppercase; margin-bottom: 3px; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; border-bottom: 2px solid #e8572a; padding: 6px 4px; font-size: 9pt; color: #e8572a; }
+td { padding: 6px 4px; border-bottom: 1px dotted #bbb; }
+.r { text-align: right; }
+.sum { margin-top: 12px; float: right; width: 2.8in; }
+.sum td { border: 0; padding: 2px 4px; }
+.sum .big td { font-size: 12pt; font-weight: bold; border-top: 2px solid #111; }
+.terms { clear: both; margin-top: 30px; font-size: 8.5pt; color: #666; }
+</style></head><body>
+<div class="band">
+  <div><div class="lg">{{ logo_big }}</div>{{ partner.street }}, {{ partner.city }} {{ partner.zip }}</div>
+  <div class="meta"><b>Purchase Order</b><br>PO # {{ po.po_number }}<br>Order date {{ po_date }}<br>Need by {{ requested_date }}</div>
+</div>
+<div class="grid">
+  <div><b>Vendor</b>{{ company.name }}<br>{{ company.street }}, {{ company.zip }} {{ company.city }}<br>{{ company.email }}</div>
+  <div><b>Ship to</b>{{ po.ship_to }}</div>
+  <div><b>Buyer</b>{{ po.buyer_email }}<br>Terms: Net 30 · {{ cur }}</div>
+</div>
+<table>
+<thead><tr><th>Item #</th><th class="r">Qty</th><th>Description</th><th class="r">Price</th><th class="r">Amount</th></tr></thead>
+<tbody>
+{% for l in lines %}<tr><td>{{ l.code }}</td><td class="r">{{ l.qty }}</td><td>{{ l.desc }}</td><td class="r">{{ l.price }}</td><td class="r">{{ l.total }}</td></tr>
+{% endfor %}
+</tbody></table>
+<table class="sum">
+<tr><td>Subtotal</td><td class="r">{{ subtotal }}</td></tr>
+<tr><td>Sales tax</td><td class="r">{{ tax }}</td></tr>
+<tr class="big"><td>Total ({{ cur }})</td><td class="r">{{ total }}</td></tr>
+</table>
+<div class="terms">{% if po.notes %}{{ po.notes }}<br>{% endif %}Ship complete unless otherwise agreed. Invoice must reference PO # {{ po.po_number }}.</div>
+</body></html>

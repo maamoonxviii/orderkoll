@@ -1,0 +1,21 @@
+From: Anna Lind <anna.lind@nordic-fasteners.example>
+To: po@orders.test
+Subject: Purchase order PO-SAMPLE-1
+Message-ID: <sample-po-1@nordic-fasteners.example>
+Date: Fri, 23 Oct 2026 09:00:00 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+Hello,
+
+please deliver the following, PO number PO-SAMPLE-1, requested date 2026-11-20.
+
+Code      Description                 Qty   Unit price
+OK-1001   Ball valve 32 mm grey        10        12.40
+OK-1003   Hex bolt M8x40 zinc         200         0.18
+
+Total: 160.00 EUR
+
+Best regards
+Anna Lind
+Nordic Fasteners AB (synthetic example)

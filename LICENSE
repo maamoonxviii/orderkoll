@@ -1,0 +1,12 @@
+This repository contains components under different licences. Each directory
+carries its own licence; the full texts are in LICENSES/.
+
+  orderkoll_core/        GNU Lesser General Public License v3.0  (LICENSES/LGPL-3.0.txt)
+  orderkoll_tier_glue/   GNU Affero General Public License v3.0  (LICENSES/AGPL-3.0.txt)
+  n8n/, tools/, docs/    MIT License                             (LICENSES/MIT.txt)
+
+Copyright (c) 2026 Maamoon Mara.
+
+orderkoll_core contains no code copied from OCA or any AGPL project and has no
+dependency on any AGPL module. orderkoll_tier_glue depends on orderkoll_core and
+OCA sale_tier_validation only.
